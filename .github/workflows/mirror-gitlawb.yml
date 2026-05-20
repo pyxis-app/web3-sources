@@ -1,0 +1,90 @@
+name: Mirror to gitlawb
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gl CLI
+        run: |
+          curl -fsSL https://gitlawb.com/install.sh -o /tmp/gl-install.sh
+          bash /tmp/gl-install.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Restore gitlawb identity from secrets
+        env:
+          GITLAWB_IDENTITY_PEM: ${{ secrets.GITLAWB_IDENTITY_PEM }}
+          GITLAWB_UCAN_JSON: ${{ secrets.GITLAWB_UCAN_JSON }}
+        run: |
+          mkdir -p "$HOME/.gitlawb"
+          chmod 700 "$HOME/.gitlawb"
+
+          # Diagnostic — print sizes + first/last 4 chars (not full secret)
+          # so we can see paste artifacts without leaking the key. Expected:
+          #   identity.pem b64: 224 chars, starts "LS0t", ends "S0K"
+          #   ucan.json    b64: 720 chars
+          STRIPPED_PEM=$(printf '%s' "$GITLAWB_IDENTITY_PEM" | tr -d '[:space:]')
+          STRIPPED_UCAN=$(printf '%s' "$GITLAWB_UCAN_JSON" | tr -d '[:space:]')
+
+          # Re-pad base64 to multiple of 4 — defense against trailing '=' chars
+          # being stripped during paste into GitHub Secrets UI.
+          pad_b64() {
+            local s="$1"
+            local rem=$(( ${#s} % 4 ))
+            case "$rem" in
+              0) printf '%s' "$s" ;;
+              2) printf '%s==' "$s" ;;
+              3) printf '%s=' "$s" ;;
+              *) printf '%s' "$s" ;;  # length % 4 == 1 is invalid b64, fail at decode
+            esac
+          }
+          PADDED_PEM=$(pad_b64 "$STRIPPED_PEM")
+          PADDED_UCAN=$(pad_b64 "$STRIPPED_UCAN")
+          echo "identity.pem b64 length: ${#STRIPPED_PEM} → padded ${#PADDED_PEM}"
+          echo "ucan.json    b64 length: ${#STRIPPED_UCAN} → padded ${#PADDED_UCAN}"
+
+          # Decode
+          printf '%s' "$PADDED_PEM"  | base64 -d > "$HOME/.gitlawb/identity.pem"
+          printf '%s' "$PADDED_UCAN" | base64 -d > "$HOME/.gitlawb/ucan.json"
+          chmod 600 "$HOME/.gitlawb/identity.pem"
+
+          # Sanity-check decoded sizes — fail fast if either is empty.
+          [ -s "$HOME/.gitlawb/identity.pem" ] || { echo "identity.pem decoded to empty"; exit 1; }
+          [ -s "$HOME/.gitlawb/ucan.json" ]    || { echo "ucan.json decoded to empty";    exit 1; }
+          wc -c "$HOME/.gitlawb/identity.pem" "$HOME/.gitlawb/ucan.json"
+
+      - name: Verify identity
+        env:
+          GITLAWB_NODE: https://node.gitlawb.com
+        run: |
+          gl doctor || true
+          gl identity show
+
+      - name: Push to gitlawb mirror
+        env:
+          GITLAWB_NODE: https://node.gitlawb.com
+        run: |
+          MY_DID=$(gl identity show)
+          git remote add gitlawb "gitlawb://$MY_DID/web3-sources"
+          # Incremental push for subsequent runs. This repo has never been
+          # mirrored, so the first run's incremental push will fail (no remote
+          # repo yet) — fall back to `gl mirror` to bootstrap from GitHub.
+          # --follow-tags propagates annotated release tags on the same push.
+          git push gitlawb main --follow-tags || {
+            echo "Incremental push failed — bootstrapping mirror from GitHub..."
+            gl mirror https://github.com/pyxis-app/web3-sources
+          }
