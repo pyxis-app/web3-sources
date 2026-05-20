@@ -1,0 +1,53 @@
+{
+  "name": "@pyxis/web3-sources",
+  "version": "0.1.0",
+  "description": "Typed TypeScript clients for 13 free crypto data APIs (CoinGecko, DefiLlama, DexScreener, Etherscan, and more). Every response carries source + freshness metadata. Zero runtime dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "crypto",
+    "web3",
+    "defi",
+    "coingecko",
+    "defillama",
+    "dexscreener",
+    "etherscan",
+    "solscan",
+    "binance",
+    "typescript",
+    "api-client"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pyxis-app/web3-sources.git"
+  },
+  "homepage": "https://github.com/pyxis-app/web3-sources#readme",
+  "bugs": {
+    "url": "https://github.com/pyxis-app/web3-sources/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.6.0"
+  }
+}
