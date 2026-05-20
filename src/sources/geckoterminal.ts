@@ -4,7 +4,7 @@ import type { WithFreshness } from "../freshness.js";
 
 const BASE = "https://api.geckoterminal.com/api/v2";
 const SOURCE = "geckoterminal";
-const POOL_TTL = 5 * 60 * 1000; // 5 min — trending bergeser pelan
+const POOL_TTL = 5 * 60 * 1000; // 5 min — trending shifts slowly
 const TIMEOUT = 4000;
 
 export interface TrendingPool {
