@@ -1,8 +1,11 @@
 # @pyxis-labs/web3-sources
 
+[![npm version](https://img.shields.io/npm/v/@pyxis-labs/web3-sources?style=flat-square&color=3b82f6)](https://www.npmjs.com/package/@pyxis-labs/web3-sources)
+[![license](https://img.shields.io/badge/license-MIT-3b82f6?style=flat-square)](https://github.com/pyxis-app/web3-sources/blob/main/LICENSE)
+
 Typed TypeScript clients for **13 free crypto data APIs** — markets, DeFi, on-chain, and social — in one zero-dependency package. Every response carries source + freshness metadata, and every call is best-effort (returns `null` instead of throwing).
 
-Extracted from the data layer of [Pyxis](https://usepyxis.com), a Web3 research swarm. The clients are open source (MIT); the agent pipeline that consumes them is not.
+Extracted from the data layer of [Pyxis](https://www.usepyxis.com), a Web3 Intelligence Swarm. The clients are open source (MIT); the agent pipeline that consumes them is not.
 
 ```bash
 npm install @pyxis-labs/web3-sources
