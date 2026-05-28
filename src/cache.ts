@@ -8,7 +8,7 @@
  *
  * @example
  * ```ts
- * import { configureCache } from "@pyxis/web3-sources";
+ * import { configureCache } from "@pyxis-labs/web3-sources";
  *
  * const store = new Map<string, { value: unknown; expires: number }>();
  * configureCache({

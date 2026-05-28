@@ -1,11 +1,11 @@
-# @pyxis/web3-sources
+# @pyxis-labs/web3-sources
 
 Typed TypeScript clients for **13 free crypto data APIs** — markets, DeFi, on-chain, and social — in one zero-dependency package. Every response carries source + freshness metadata, and every call is best-effort (returns `null` instead of throwing).
 
 Extracted from the data layer of [Pyxis](https://usepyxis.com), a Web3 research swarm. The clients are open source (MIT); the agent pipeline that consumes them is not.
 
 ```bash
-npm install @pyxis/web3-sources
+npm install @pyxis-labs/web3-sources
 ```
 
 > Requires Node 18+ (uses global `fetch` and `AbortSignal.timeout`).
@@ -13,7 +13,7 @@ npm install @pyxis/web3-sources
 ## Quick start
 
 ```ts
-import { getCoinSnapshot, getProtocol, getFearGreed } from "@pyxis/web3-sources";
+import { getCoinSnapshot, getProtocol, getFearGreed } from "@pyxis-labs/web3-sources";
 
 const eth = await getCoinSnapshot("ethereum");
 console.log(eth?.data.priceUsd, eth?.meta.sampledAt);
@@ -48,7 +48,7 @@ interface WithFreshness<T> {
 By default there is **no cache** — every call hits the network. Register a `CacheAdapter` once at startup to respect API rate limits. The adapter is yours: a `Map`, Redis, Postgres, anything.
 
 ```ts
-import { configureCache } from "@pyxis/web3-sources";
+import { configureCache } from "@pyxis-labs/web3-sources";
 
 const store = new Map<string, { value: unknown; expires: number }>();
 configureCache({
@@ -97,7 +97,7 @@ GetXAPI is metered per call; cap spend per session with `GETXAPI_MAX_CALLS` (def
 The same `fetchJson` helper the built-in clients use is exported:
 
 ```ts
-import { fetchJson, cacheKey } from "@pyxis/web3-sources";
+import { fetchJson, cacheKey } from "@pyxis-labs/web3-sources";
 
 const res = await fetchJson<{ price: number }>("https://api.example.com/price", {
   source: "example",

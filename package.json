@@ -1,5 +1,5 @@
 {
-  "name": "@pyxis/web3-sources",
+  "name": "@pyxis-labs/web3-sources",
   "version": "0.1.0",
   "description": "Typed TypeScript clients for 13 free crypto data APIs (CoinGecko, DefiLlama, DexScreener, Etherscan, and more). Every response carries source + freshness metadata. Zero runtime dependencies.",
   "license": "MIT",
